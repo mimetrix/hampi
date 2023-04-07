@@ -9,6 +9,7 @@ publish = false
 
 [build-dependencies]
 asn1-compiler = { path = "../asn-compiler", version = "=0.5.8" }
+log = { version = "0.4" }
 
 [dev-dependencies]
 asn1-codecs = { path = "../codecs", version = "=0.5.8" }

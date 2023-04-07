@@ -44,6 +44,9 @@ pub(crate) fn parse_enumerated_type(
     tokens: &[Token],
 ) -> Result<(Asn1TypeEnumerated, usize), Error> {
     let mut consumed = 0;
+    
+    log::debug!("parse_enumerated_type");
+    
 
     if !expect_keyword(tokens, "ENUMERATED")? {
         return Err(unexpected_token!("ENUMERATED", tokens[0]));

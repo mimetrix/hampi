@@ -43,21 +43,22 @@ fn get_specs_files(
 }
 
 fn main() -> std::io::Result<()> {
-    //let specs = vec!["ranap", "s1ap", "ngap", "e2ap", "supl","f1ap",];
-    //let modules = vec!["ranap.rs", "s1ap.rs", "ngap.rs", "e2ap.rs", "supl.rs","f1ap",];
+    let specs = vec!["ranap", "s1ap", "ngap", "e2ap", "supl","f1ap",];
+    let modules = vec!["ranap.rs", "s1ap.rs", "ngap.rs", "e2ap.rs", "supl.rs","f1ap.rs",];
+
     
 
-    let specs = vec!["f1ap"];
-    let modules = vec!["f1ap.rs"];
+    //let specs = vec!["f1ap"];
+    //let modules = vec!["f1ap.rs"];
     let mut codecs_map = HashMap::new();
-    //codecs_map.insert("ranap.rs", vec![Codec::Aper]);
-    //codecs_map.insert("s1ap.rs", vec![Codec::Aper]);
-    //codecs_map.insert("ngap.rs", vec![Codec::Aper]);
-    //codecs_map.insert("e2ap.rs", vec![Codec::Aper]);
-    //codecs_map.insert("supl.rs", vec![Codec::Uper]);
+    codecs_map.insert("ranap.rs", vec![Codec::Aper]);
+    codecs_map.insert("s1ap.rs", vec![Codec::Aper]);
+    codecs_map.insert("ngap.rs", vec![Codec::Aper]);
+    codecs_map.insert("e2ap.rs", vec![Codec::Aper]);
+    codecs_map.insert("supl.rs", vec![Codec::Uper]);
     codecs_map.insert("f1ap.rs", vec![Codec::Aper]);
 
-    eprintln!("codecs_map: {:#?}", codecs_map);
+    println!("codecs_map: {:#?}", codecs_map);
     for (spec, module) in std::iter::zip(specs, modules) {
         let specs_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap())
             .join("specs")
@@ -78,6 +79,7 @@ fn main() -> std::io::Result<()> {
                 Derive::Deserialize,
             ],
         );
+        debug!("compiling files");
         compiler.compile_files(&specs_files)?;
     }
 

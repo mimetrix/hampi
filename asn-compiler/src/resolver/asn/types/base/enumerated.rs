@@ -18,6 +18,10 @@ impl Asn1ResolvedEnumerated {
         e: &Asn1TypeEnumerated,
         _resolver: &Resolver,
     ) -> Result<Asn1ResolvedEnumerated, Error> {
+
+
+        log::debug!("resolve_enumerated");
+
         let mut base = Asn1ResolvedEnumerated {
             extensible: e.ext_marker_index.is_some(),
             ..Default::default()

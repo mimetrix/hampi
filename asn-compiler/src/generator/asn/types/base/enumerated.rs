@@ -14,6 +14,7 @@ impl Asn1ResolvedEnumerated {
         name: &str,
         generator: &mut Generator,
     ) -> Result<TokenStream, Error> {
+        log::debug!("generate");
         let struct_name = generator.to_type_ident(name);
         let inner_type = generator.to_inner_type(self.bits, self.signed);
 
@@ -30,6 +31,7 @@ impl Asn1ResolvedEnumerated {
         let vis = generator.get_visibility_tokens();
         let dir = generator.generate_derive_tokens();
 
+        /*
         let struct_tokens = quote! {
             #dir
             #[asn(#ty_attributes)]
@@ -39,7 +41,19 @@ impl Asn1ResolvedEnumerated {
                 #named_values
             }
         };
+        */
 
+         let struct_tokens = quote! {
+            #dir
+            #[asn(#ty_attributes)]
+            #vis enum #struct_name {
+                #named_values
+            }
+        };
+
+        
+        log::debug!("");
+        log::debug!("enum_tokens\n{}",struct_tokens.to_string());
         Ok(struct_tokens)
     }
 
@@ -50,10 +64,15 @@ impl Asn1ResolvedEnumerated {
             let value_literal = generator.to_suffixed_literal(self.bits, self.signed, *value);
             let ty = generator.to_inner_type(self.bits, self.signed);
 
+            /*
             let vis = generator.get_visibility_tokens();
-
             let const_tokens = quote! {
                 #vis const #const_name: #ty =  #value_literal ;
+            };
+            tokens.extend(const_tokens);
+            */
+            let const_tokens = quote!{
+                #const_name,
             };
             tokens.extend(const_tokens);
         }
