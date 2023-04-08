@@ -10,6 +10,8 @@ pub(super) fn generate_aper_codec_for_asn_choice(
     params: &TyCodecParams,
     aligned: bool,
 ) -> proc_macro::TokenStream {
+
+    println!("generate_aper_codec_for_asn_choice");
     let name = &ast.ident;
 
     let (codec_path, codec_encode_fn, codec_decode_fn, ty_encode_path, ty_decode_path) = if aligned
@@ -77,6 +79,7 @@ pub(super) fn generate_aper_codec_for_asn_choice(
         }
     };
 
+    println!("--tokens--\n{}",tokens);
     TokenStream::from(tokens)
 }
 

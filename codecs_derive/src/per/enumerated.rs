@@ -10,6 +10,9 @@ pub(super) fn generate_aper_codec_for_asn_enumerated(
     aligned: bool,
 ) -> proc_macro::TokenStream {
     let name = &ast.ident;
+    
+    log::trace!("generate_aper_codec_for_asn_enumerated");
+    println!("generate_aper_codec_for_asn_enumerated");
 
     let (codec_path, codec_encode_fn, codec_decode_fn, ty_encode_path, ty_decode_path) = if aligned
     {
@@ -29,6 +32,7 @@ pub(super) fn generate_aper_codec_for_asn_enumerated(
             quote!(asn1_codecs::uper::decode::decode_enumerated),
         )
     };
+
     let ty = if let syn::Data::Struct(ref d) = &ast.data {
         match d.fields {
             syn::Fields::Unnamed(ref f) => {
@@ -45,11 +49,16 @@ pub(super) fn generate_aper_codec_for_asn_enumerated(
         None
     };
 
+
+    println!("{:#?}",ty);
+
+/*
     if ty.is_none() {
         return syn::Error::new_spanned(ast, format!("{} Should be a Unit Struct.", name))
             .to_compile_error()
             .into();
     }
+*/
 
     let (lb, ub, ext) = utils::get_bounds_extensible_from_params(params);
 
@@ -73,6 +82,7 @@ pub(super) fn generate_aper_codec_for_asn_enumerated(
             }
         }
     };
-
+    
+    println!("--tokens--\n{}",tokens);
     tokens.into()
 }
