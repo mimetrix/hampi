@@ -43,8 +43,8 @@ fn get_specs_files(
 }
 
 fn main() -> std::io::Result<()> {
-    let specs = vec!["ranap", "s1ap", "ngap", "e2ap", "supl","f1ap",];
-    let modules = vec!["ranap.rs", "s1ap.rs", "ngap.rs", "e2ap.rs", "supl.rs","f1ap.rs",];
+    let specs = vec!["ranap", "s1ap", "ngap", "e2ap", "supl","f1ap","rrc"];
+    let modules = vec!["ranap.rs", "s1ap.rs", "ngap.rs", "e2ap.rs", "supl.rs","f1ap.rs","rrc.rs"];
 
     
 
@@ -57,6 +57,7 @@ fn main() -> std::io::Result<()> {
     codecs_map.insert("e2ap.rs", vec![Codec::Aper]);
     codecs_map.insert("supl.rs", vec![Codec::Uper]);
     codecs_map.insert("f1ap.rs", vec![Codec::Aper]);
+    codecs_map.insert("rrc.rs", vec![Codec::Aper]);
 
     println!("codecs_map: {:#?}", codecs_map);
     for (spec, module) in std::iter::zip(specs, modules) {

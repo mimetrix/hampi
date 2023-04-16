@@ -11,7 +11,7 @@ pub(super) fn generate_aper_codec_for_asn_choice(
     aligned: bool,
 ) -> proc_macro::TokenStream {
 
-    println!("generate_aper_codec_for_asn_choice");
+    //println!("generate_aper_codec_for_asn_choice");
     let name = &ast.ident;
 
     let (codec_path, codec_encode_fn, codec_decode_fn, ty_encode_path, ty_decode_path) = if aligned
@@ -50,6 +50,7 @@ pub(super) fn generate_aper_codec_for_asn_choice(
     }
     let (variant_decode_tokens, variant_encode_tokens) = variant_tokens.unwrap();
 
+
     let tokens = quote! {
 
         impl #codec_path for #name {
@@ -79,11 +80,11 @@ pub(super) fn generate_aper_codec_for_asn_choice(
         }
     };
 
-    println!("--tokens--\n{}",tokens);
+    //println!("--tokens--\n{}",tokens);
     TokenStream::from(tokens)
 }
 
-fn generate_choice_variant_decode_tokens_using_attrs(
+pub fn generate_choice_variant_decode_tokens_using_attrs(
     ast: &syn::DeriveInput,
     lb: i128,
     ub: i128,

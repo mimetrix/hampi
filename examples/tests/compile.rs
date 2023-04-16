@@ -2,7 +2,8 @@
 #[test]
 fn tests() {
     let t = trybuild::TestCases::new();
-    t.pass("tests/10-f1ap.rs");
+    //t.pass("tests/10-f1ap.rs");
+    t.pass("tests/09-rrc.rs");
     //t.pass("tests/11-ranap.rs");
     //t.pass("tests/12-s1ap.rs");
     //t.pass("tests/13-ngap.rs");
