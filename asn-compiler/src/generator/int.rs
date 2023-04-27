@@ -185,6 +185,26 @@ impl Generator {
         }
     }
 
+    pub(crate) fn to_isize_unsuffixed(&self, bits: u8, signed: bool, value: i128) -> Literal {
+        if !signed {
+            match bits {
+                8 => Literal::isize_unsuffixed(value as isize),
+                16 => Literal::isize_unsuffixed(value as isize),
+                32 => Literal::isize_unsuffixed(value as isize),
+                64 => Literal::isize_unsuffixed(value as isize),
+                _ => Literal::isize_unsuffixed(value as isize),
+            }
+        } else {
+            match bits {
+                8 => Literal::isize_unsuffixed(value as isize),
+                16 => Literal::isize_unsuffixed(value as isize),
+                32 => Literal::isize_unsuffixed(value as isize),
+                64 => Literal::isize_unsuffixed(value as isize),
+                _ => Literal::isize_unsuffixed(value as isize),
+            }
+        }
+    }
+
     pub(crate) fn to_suffixed_literal(&self, bits: u8, signed: bool, value: i128) -> Literal {
         if !signed {
             match bits {

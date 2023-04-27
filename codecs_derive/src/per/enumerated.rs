@@ -67,7 +67,7 @@ pub(super) fn generate_aper_codec_for_asn_enumerated(
 ) -> proc_macro::TokenStream {
     let name = &ast.ident;
     
-    //log::trace!("generate_aper_codec_for_asn_enumerated");
+    log::trace!("generate_aper_codec_for_asn_enumerated");
     //println!("generate_aper_codec_for_asn_enumerated");
 
     let (lb, ub, ext) = utils::get_bounds_extensible_from_params(params);
@@ -160,11 +160,11 @@ pub(super) fn generate_aper_codec_for_asn_enumerated(
         let (variant_decode_tokens, variant_encode_tokens) = variant_tokens.unwrap();
 
 
-        println!("Bounds: {} {} \n", lb, ub);
+        //println!("Bounds: {} {} \n", lb, ub);
         //println!("variants: {:#?} \n", variant_encode_tokens);
 
         //println!("enum impl aper codec:\n{}\n",tokens.to_string());
-        quote! {
+        let ret = quote! {
 
             impl #codec_path for #name {
                 type Output = Self;
@@ -172,15 +172,25 @@ pub(super) fn generate_aper_codec_for_asn_enumerated(
                 fn #codec_decode_fn(data: &mut asn1_codecs::PerCodecData) -> Result<Self::Output, asn1_codecs::PerCodecError> {
                     log::trace!(concat!("decode: ", stringify!(#name)));
 
-                    let (idx, extended) = #ty_decode_path(data, Some(#lb) , Some(#ub), #ext)?;
+                    let (idx, _) = #ty_decode_path(data, Some(#lb) , Some(#ub), #ext)?;
+                    //let idx= #ty_decode_path(data, Some(#lb) , Some(#ub), #ext)?;
+                    //let decoded = #ty_decode_path(data, #lb, #ub, #ext)?;
+                    match idx {
+                        #(#variant_decode_tokens)*
+                        _ => Err(asn1_codecs::PerCodecError::new(format!("Index {} is not a valid Choice Index", idx).as_str()))
+                    }
+                    /*
                     if !extended {
+                        log::trace!("is not extended");
                         match idx {
                             #(#variant_decode_tokens)*
                             _ => Err(asn1_codecs::PerCodecError::new(format!("Index {} is not a valid Choice Index", idx).as_str()))
                     }
                     } else {
-                        Err(asn1_codecs::PerCodecError::new("CHOICE Additions not supported yet."))
+                        log::trace!("is extended");
+                        Err(asn1_codecs::PerCodecError::new(format!("ENUM Additions not supported yet: {}::{}", stringify!(#name), idx)))
                     }
+                    */
                 }
 
                 fn #codec_encode_fn(&self, data: &mut asn1_codecs::PerCodecData) -> Result<(), asn1_codecs::PerCodecError> {
@@ -191,9 +201,11 @@ pub(super) fn generate_aper_codec_for_asn_enumerated(
                     }
                 }
             }
-        }
+        };
         
 
+        //println!("{}", ret.to_string());
+        ret
 
 
 
@@ -204,7 +216,7 @@ pub(super) fn generate_aper_codec_for_asn_enumerated(
         */
 
     } else {
-        syn::Error::new_spanned(ast, format!("{} Should be a Unit Struct.", name))
+        syn::Error::new_spanned(ast, format!("{} Should be a Unit Struct or Enum", name))
             .to_compile_error()
             .into()
     };

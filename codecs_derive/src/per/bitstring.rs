@@ -63,6 +63,8 @@ pub(super) fn generate_aper_codec_for_asn_bitstring(
                 log::trace!(concat!("decode: ", stringify!(#name)));
 
                 let decoded = #ty_decode_path(data, #sz_lb, #sz_ub, #sz_ext)?;
+                //log::trace!(format!(" {} value: {:#?} ", stringify!(#name), decoded ));
+                log::trace!("{} value: {:#?}",stringify!(#name), decoded);
                 Ok(Self(decoded))
             }
 

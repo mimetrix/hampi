@@ -55,6 +55,8 @@ pub fn decode_sequence_header_common(
         false
     };
 
+    log::trace!("decode_sequence_header_common: decoding {:x?} ", &data.bits[0..10]);
+
     let mut bitmap = BitVec::new();
     if optional_count > 0 {
         bitmap.extend(data.get_bitvec(optional_count)?);
@@ -77,6 +79,9 @@ pub fn decode_integer_common(
     } else {
         false
     };
+
+    log::trace!("decode_integer_common: decoding {:x?}", 
+        &data.bits[data.decode_offset..data.decode_offset+10]);
 
     let value = if extended_value {
         // 12.1
@@ -134,6 +139,9 @@ pub fn decode_enumerated_common(
         is_extensible
     );
 
+    log::trace!("decode_enumerated_common: decoding {:x?} ", 
+        &data.bits[data.decode_offset..data.decode_offset+10]);
+
     let is_extended = if is_extensible {
         data.decode_bool()?
     } else {
@@ -166,6 +174,10 @@ pub fn decode_bitstring_common(
         false
     };
 
+    data.dump();
+    log::trace!("decode_bitstring_common: decoding {:x?} ", 
+        &data.bits[data.decode_offset..]);
+
     let mut bv = BitVec::new();
     loop {
         let length = if is_extended {
@@ -173,6 +185,8 @@ pub fn decode_bitstring_common(
         } else {
             decode_length_determinent_common(data, lb, ub, false, aligned)?
         };
+
+        log::trace!("decode_bitstring_common: decoding {} bits", length);
 
         if length > 0 {
             if length > 16 {
@@ -192,6 +206,10 @@ pub fn decode_bitstring_common(
     }
 
     data.dump();
+    
+
+    log::trace!("decode_bitstring_common: bv {:x?} ", bv);
+
 
     Ok(bv)
 }
@@ -205,7 +223,7 @@ pub fn decode_octetstring_common(
     aligned: bool,
 ) -> Result<Vec<u8>, PerCodecError> {
     log::trace!(
-        "decode_bitstring: lb: {:?}, ub: {:?}, is_extensible: {}",
+        "decode_octetstring_common: lb: {:?}, ub: {:?}, is_extensible: {}",
         lb,
         ub,
         is_extensible
@@ -225,6 +243,8 @@ pub fn decode_octetstring_common(
             decode_length_determinent_common(data, lb, ub, false, aligned)?
         };
 
+
+        log::trace!("decode_octet_string_common: decoding {} octets", length);
         if length > 0 {
             if length > 2 {
                 if aligned {

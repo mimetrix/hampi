@@ -25,6 +25,46 @@ pub struct PerCodecData {
     aligned: bool,
 }
 
+
+fn next_eight_bytes(buf: &PerCodecData){
+
+    let remaining = buf.bits.len() - buf.decode_offset;
+
+    let end = match remaining {
+        64.. => 64,
+        _ => remaining,
+    };
+    
+    let mut bytes: Vec<u16> = Vec::new();
+
+    log::trace!("\n\n_____: decoding {:x?} ", 
+        &buf.bits[buf.decode_offset..]);
+
+    let mut i = buf.decode_offset;
+    loop{
+        if i == buf.decode_offset +  end{
+            break;
+        }
+        let byte =  ((buf.bits[i+0] as u16 ) << 7) + 
+            ((buf.bits[i+1]  as u16) << 6) + 
+            ((buf.bits[i+2]  as u16) << 5) + 
+            ((buf.bits[i+3]  as u16) << 4) + 
+            ((buf.bits[i+4]  as u16) << 3) + 
+            ((buf.bits[i+5]  as u16) << 2) + 
+            ((buf.bits[i+6]  as u16) << 1) + 
+            (buf.bits[i+7] as u16);
+
+        bytes.push(byte);
+        log::trace!("pushed {:x}", byte);
+        i = i + 8;
+        
+    }
+
+    log::trace!("current:\n{:x?}\n", &bytes);
+
+
+}
+
 impl PerCodecData {
     /// Default `PerCodecData` for AperCodec
     pub fn new_aper() -> Self {
@@ -68,6 +108,10 @@ impl PerCodecData {
         if self.decode_offset % 8 == 0 {
             return Ok(());
         }
+
+        
+        //next_eight_bytes(self);
+
 
         let remaining = 8 - (self.decode_offset & 0x7_usize);
         log::trace!("Aligning Codec Buffer with {} bits", remaining);
@@ -113,8 +157,9 @@ impl PerCodecData {
             ))
         } else {
             log::trace!(
-                "Decoding Bits as Integer. offset: {}, bits: {}",
+                "Decoding Bits as Integer. offset: {}(0x{:x}), bits: {}",
                 self.decode_offset,
+                self.decode_offset/8,
                 bits
             );
             let value = if !signed {

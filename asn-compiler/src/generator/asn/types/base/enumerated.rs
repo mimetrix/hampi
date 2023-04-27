@@ -23,6 +23,9 @@ impl Asn1ResolvedEnumerated {
         let mut ty_attributes = quote! { type = "ENUMERATED" };
         if self.extensible {
             ty_attributes.extend(quote! { , extensible = true });
+        } else {
+            //added to support asn1 enumerated types as enums
+            ty_attributes.extend(quote! { , extensible = false});
         }
         let ub = format!("{}", self.named_root_values.len() - 1);
         ty_attributes.extend(quote! { , lb = "0" });
@@ -61,8 +64,8 @@ impl Asn1ResolvedEnumerated {
         let mut tokens = TokenStream::new();
         for (name, value) in &self.named_root_values {
             let const_name = generator.to_const_ident(name);
-            let value_literal = generator.to_suffixed_literal(self.bits, self.signed, *value);
-
+            let value_literal = generator.to_isize_unsuffixed(self.bits, self.signed, *value);
+            //let value_literal = generator.to_suffixed_literal(self.bits, self.signed, *value);
 
             /*
             let ty = generator.to_inner_type(self.bits, self.signed);

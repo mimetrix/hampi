@@ -52,6 +52,9 @@ pub(crate) fn decode_length_determinent_common(
         return decode_normally_small_length_determinent_common(data, aligned);
     }
 
+    log::trace!("decode_length_determinent_common: lb:{:?}, ub:{:?}, normally_small:{}, aligned:{}",
+        lb, ub, normally_small, aligned);
+
     let lb = if let Some(l) = lb {
         l.try_into().unwrap()
     } else {
@@ -172,9 +175,11 @@ pub(super) fn decode_constrained_whole_number_common(
     ub: i128,
     aligned: bool,
 ) -> Result<i128, PerCodecError> {
-    log::trace!("decode_constrained_whole_number: lb: {}, ub: {}", lb, ub,);
 
     let range = ub - lb + 1;
+    log::trace!(
+        "decode_constrained_whole_number: lb: {}, ub: {}, range: {}, aligned: {}", 
+        lb, ub, range, aligned);
     if range <= 0 {
         Err(PerCodecError::new(
             "Range for the Integer Constraint is negative.",
@@ -214,7 +219,7 @@ pub(super) fn decode_constrained_whole_number_common(
             };
 
             Ok(value + lb)
-        } else {
+        } else { //not aligned
             if range > 1 {
                 let leading_zeros = (range - 1).leading_zeros();
                 let bits = 128 - leading_zeros as usize;
