@@ -76,5 +76,6 @@ pub(super) fn generate_aper_codec_for_asn_bitstring(
         }
     };
 
+    //println!("\ngenerate_aper_codec_for_asn_bitstring\n{}\n",tokens.to_string());
     tokens.into()
 }

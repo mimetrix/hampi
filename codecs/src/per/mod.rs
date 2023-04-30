@@ -334,6 +334,24 @@ impl PerCodecData {
         Ok(BitVec::into_vec(bv))
     }
 
+    pub fn peek_bytes(&self, length: usize) -> Result<Vec<u8>, PerCodecError> {
+        let length = length * 8;
+        if length + self.decode_offset > self.bits.len() {
+            return Err(PerCodecError::new(
+                format!(
+                    "PerCodec:GetBitError:Requested Bits {}, Remaining bits {}",
+                    length,
+                    self.bits.len() - self.decode_offset
+                )
+                .as_str(),
+            ));
+        }
+        let mut bv = self.bits[self.decode_offset..self.decode_offset + length].to_bitvec();
+        bv.force_align();
+        //self.advance_maybe_err(length, true)?;
+        Ok(BitVec::into_vec(bv))
+    }
+
     pub fn get_inner(&self) -> Result<Vec<u8>, PerCodecError> {
         Ok(BitVec::into_vec(self.bits.to_bitvec()))
     }
