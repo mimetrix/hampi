@@ -27,29 +27,12 @@ fn generate_variant_decode_tokens(
 
             let variant_decode_token = quote! {
                 #key => Ok(Self::#variant_ident),
-                //0 => Ok(Self::CASHIER),
-                //1 => Ok(Self::MANAGER),
             };
 
 
-/*
-            let variant_encode_token = quote! {
-                Self::#variant_ident => Ok((#key)),
-            };
-
-*/
             let variant_encode_token = quote! {
                 Self::#variant_ident => Ok(()),
             };
-		/*
-
-	    let variant_encode_token = quote! {
-		Self::#variant_ident => {
-		    #choice_encode_path(data, #lb, #ub, #ext, #key, false)?;
-		    Self.#codec_encode_fn(data)
-		}
-	    };
-*/
 
             decode_tokens.push(variant_decode_token);
             encode_tokens.push(variant_encode_token);
@@ -135,7 +118,6 @@ pub(super) fn generate_aper_codec_for_asn_enumerated(
 
 
     } else if let syn::Data::Enum(ref _data_enum) = &ast.data { 
-    //} else if let syn::Data::Enum() = &ast.data { 
 
         let lb = params.lb.as_ref().unwrap().value().parse::<i128>().unwrap();
         let ub = params.ub.as_ref().unwrap().value().parse::<i128>().unwrap();
@@ -144,12 +126,6 @@ pub(super) fn generate_aper_codec_for_asn_enumerated(
 
         let variant_tokens = generate_variant_decode_tokens(
             ast,
-            //lb,
-            //ub,
-            //ext,
-            //codec_encode_fn.clone(),
-            //codec_decode_fn.clone(),
-            //ty_encode_path,
         );
      
 
@@ -160,10 +136,6 @@ pub(super) fn generate_aper_codec_for_asn_enumerated(
         let (variant_decode_tokens, variant_encode_tokens) = variant_tokens.unwrap();
 
 
-        //println!("Bounds: {} {} \n", lb, ub);
-        //println!("variants: {:#?} \n", variant_encode_tokens);
-
-        //println!("enum impl aper codec:\n{}\n",tokens.to_string());
         let ret = quote! {
 
             impl #codec_path for #name {
@@ -173,24 +145,11 @@ pub(super) fn generate_aper_codec_for_asn_enumerated(
                     log::trace!(concat!("decode: ", stringify!(#name)));
 
                     let (idx, _) = #ty_decode_path(data, Some(#lb) , Some(#ub), #ext)?;
-                    //let idx= #ty_decode_path(data, Some(#lb) , Some(#ub), #ext)?;
-                    //let decoded = #ty_decode_path(data, #lb, #ub, #ext)?;
+
                     match idx {
                         #(#variant_decode_tokens)*
                         _ => Err(asn1_codecs::PerCodecError::new(format!("Index {} is not a valid Choice Index", idx).as_str()))
                     }
-                    /*
-                    if !extended {
-                        log::trace!("is not extended");
-                        match idx {
-                            #(#variant_decode_tokens)*
-                            _ => Err(asn1_codecs::PerCodecError::new(format!("Index {} is not a valid Choice Index", idx).as_str()))
-                    }
-                    } else {
-                        log::trace!("is extended");
-                        Err(asn1_codecs::PerCodecError::new(format!("ENUM Additions not supported yet: {}::{}", stringify!(#name), idx)))
-                    }
-                    */
                 }
 
                 fn #codec_encode_fn(&self, data: &mut asn1_codecs::PerCodecData) -> Result<(), asn1_codecs::PerCodecError> {
@@ -204,16 +163,7 @@ pub(super) fn generate_aper_codec_for_asn_enumerated(
         };
         
 
-        //println!("{}", ret.to_string());
         ret
-
-
-
-        /*
-        syn::Error::new_spanned(ast, format!("{} as enum currently not implemented.", name))
-            .to_compile_error()
-            .into()
-        */
 
     } else {
         syn::Error::new_spanned(ast, format!("{} Should be a Unit Struct or Enum", name))

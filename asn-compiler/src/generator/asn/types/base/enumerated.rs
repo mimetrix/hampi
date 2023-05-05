@@ -74,7 +74,6 @@ impl Asn1ResolvedEnumerated {
                 #vis const #const_name: #ty =  #value_literal ;
             };
             tokens.extend(const_tokens);
-
             */
 
             let const_tokens = quote!{
