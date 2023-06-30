@@ -64,6 +64,7 @@ pub(super) fn generate_aper_codec_for_asn_sequence(
                 log::trace!(concat!("decode: ", stringify!(#name)));
 
                 let (bitmap, _extensions_present) = #ty_decode_path(data, #ext, #opt_count)?;
+                log::trace!("extended?: {}",_extensions_present);
                 Ok(Self{#(#fld_decode_tokens)*})
             }
 
@@ -82,6 +83,8 @@ pub(super) fn generate_aper_codec_for_asn_sequence(
             }
         }
     };
+
+    //println!("{}",tokens.to_string());
 
     tokens.into()
 }

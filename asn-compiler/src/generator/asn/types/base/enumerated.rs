@@ -8,6 +8,8 @@ use crate::error::Error;
 use crate::generator::Generator;
 use crate::resolver::asn::structs::types::base::Asn1ResolvedEnumerated;
 
+use std::env;
+
 impl Asn1ResolvedEnumerated {
     pub(crate) fn generate(
         &self,
@@ -16,7 +18,7 @@ impl Asn1ResolvedEnumerated {
     ) -> Result<TokenStream, Error> {
         log::debug!("generate");
         let struct_name = generator.to_type_ident(name);
-        //let inner_type = generator.to_inner_type(self.bits, self.signed);
+        let inner_type = generator.to_inner_type(self.bits, self.signed);
 
         let named_values = self.generate_named_values(generator)?;
 
@@ -34,50 +36,63 @@ impl Asn1ResolvedEnumerated {
         let vis = generator.get_visibility_tokens();
         let dir = generator.generate_derive_tokens();
 
-        /*
-        let struct_tokens = quote! {
-            #dir
-            #[asn(#ty_attributes)]
-            #vis struct #struct_name(#vis #inner_type);
 
-            impl #struct_name {
-                #named_values
-            }
-        };
-        */
-
-        let struct_tokens = quote! {
-            #dir
-            #[asn(#ty_attributes)]
-            #vis enum #struct_name {
-                #named_values
-            }
+        let key = "ENUMS";
+        let val = match env::var(key){
+            Ok(val) => val,
+            Err(e) => format!("{:?}",e),
         };
 
+        let struct_tokens = match val.as_str() {
+            "ENUMS" => 
+            quote! {
+                #dir
+                #[asn(#ty_attributes)]
+                #vis enum #struct_name {
+                    #named_values
+                }
+            },
         
-        log::debug!("");
+            _ => 
+            quote! {
+                #dir
+                #[asn(#ty_attributes)]
+                #vis struct #struct_name(#vis #inner_type);
+                impl #struct_name {
+                #named_values
+                }
+            },
+        };
+        
         log::debug!("enum_tokens\n{}",struct_tokens.to_string());
         Ok(struct_tokens)
     }
 
     fn generate_named_values(&self, generator: &Generator) -> Result<TokenStream, Error> {
         let mut tokens = TokenStream::new();
+
+        let key = "ENUMS";
+        let val = match env::var(key){
+            Ok(val) => val,
+            Err(e) => format!("{:?}",e),
+        };
+
         for (name, value) in &self.named_root_values {
             let const_name = generator.to_const_ident(name);
             let value_literal = generator.to_isize_unsuffixed(self.bits, self.signed, *value);
-            //let value_literal = generator.to_suffixed_literal(self.bits, self.signed, *value);
+            let const_tokens = match val.as_str() {
+                "ENUMS" => 
+                    quote!{
+                        #const_name = #value_literal,
+                    },
+                _ => {
 
-            /*
-            let ty = generator.to_inner_type(self.bits, self.signed);
-            let vis = generator.get_visibility_tokens();
-            let const_tokens = quote! {
-                #vis const #const_name: #ty =  #value_literal ;
-            };
-            tokens.extend(const_tokens);
-            */
-
-            let const_tokens = quote!{
-                #const_name = #value_literal,
+                    let ty = generator.to_inner_type(self.bits, self.signed);
+                    let vis = generator.get_visibility_tokens();
+                    quote! {
+                        #vis const #const_name: #ty =  #value_literal ;
+                    }
+                },
             };
             tokens.extend(const_tokens);
         }

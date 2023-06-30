@@ -110,11 +110,9 @@ impl PerCodecData {
         }
 
         
-        //next_eight_bytes(self);
-
-
         let remaining = 8 - (self.decode_offset & 0x7_usize);
         log::trace!("Aligning Codec Buffer with {} bits", remaining);
+        log::trace!("next {} bits:{}",remaining, &self.bits[self.decode_offset..self.decode_offset + remaining] );
 
         if !self.bits[self.decode_offset..self.decode_offset + remaining]
             .iter()
@@ -379,6 +377,10 @@ impl PerCodecData {
     #[inline]
     pub fn dump(&self) {
         log::trace!("PerCodecData: offset: {}", self.decode_offset);
+        log::trace!("PerCodecData: len: {}", self.bits.len());
+        let beg = self.decode_offset;
+        let end = self.decode_offset + 16;
+        log::trace!("PerCodecData: next 16: {}", &self.bits[beg..end]);
     }
 
     #[inline]

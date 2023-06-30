@@ -66,7 +66,7 @@ pub(super) fn generate_aper_codec_for_asn_choice(
                         _ => Err(asn1_codecs::PerCodecError::new(format!("Index {} is not a valid Choice Index", idx).as_str()))
                     }
                 } else {
-                    Err(asn1_codecs::PerCodecError::new("CHOICE Additions not supported yet."))
+                    Err(asn1_codecs::PerCodecError::new( format!("Error: CHOICE Additions not supported yet while decoding {}", stringify!(#name) )))
                 }
             }
 
