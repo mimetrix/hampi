@@ -63,11 +63,19 @@ pub(super) fn generate_aper_codec_for_asn_sequence(
             fn #codec_decode_fn(data: &mut asn1_codecs::PerCodecData) -> Result<Self::Output, asn1_codecs::PerCodecError> {
                 log::trace!(concat!("decode: ", stringify!(#name)));
 
-                let (bitmap, _extensions_present) = #ty_decode_path(data, #ext, #opt_count)?;
-                log::trace!("extended?: {}",_extensions_present);
-                Ok(Self{#(#fld_decode_tokens)*})
-            }
+                let (bitmap, extensions_present) = #ty_decode_path(data, #ext, #opt_count)?;
+                log::trace!("extended?: {}", extensions_present);
 
+                if extensions_present {
+                    Err(asn1_codecs::PerCodecError::new( format!("Error: SEQUENCE Extensions  not supported yet for {}", stringify!(#name) )))
+                    //Ok(Self{#(#fld_decode_tokens)*})
+                } else {
+                    Ok(Self{#(#fld_decode_tokens)*})
+                }
+
+                //Ok(Self{#(#fld_decode_tokens)*})
+
+            }
             fn #codec_encode_fn(&self, data: &mut asn1_codecs::PerCodecData) -> Result<(), asn1_codecs::PerCodecError> {
                 log::trace!(concat!("encode: ", stringify!(#name)));
 
